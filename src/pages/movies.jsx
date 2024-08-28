@@ -8,51 +8,46 @@ export const MoviePage = () => {
   const [movies, setMovies] = useState([]);
   const [cart, setCart] = useState([]);
 
-  // const user = localStorage.getItem("user");
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  // const fetchCart = useCallback(async () => {
-  //   const response = await fetch(`http://127.0.0.1:5000/api/cart/${user}`);
-  //   if (response.ok) {
-  //     const existingCart = await response.json();
-  //     setCart(existingCart);
-  //   }
-  // }, [user]);
+  const fetchCart = useCallback(async () => {
+    // const response = await fetch(`http://127.0.0.1:5000/api/cart/${user}`);
+    // if (response.ok) {
+    //   const existingCart = await response.json();
+    //   setCart(existingCart);
+    // }
+  }, [user]);
 
-  // useEffect(() => {
-  //   fetchCart();
-  // }, [fetchCart]);
-
-  // const updateCart = (id, removeFromCart) => {
-  //   console.log(`movie_id=${id}`);
-  //   let newCart = [...cart];
-  //   if (!removeFromCart) {
-  //     newCart.unshift(id);
-  //     fetch("http://127.0.0.1:5000/api/cart/add/", {
-  //       method: "post",
-  //       body: JSON.stringify({ member_id: user, movie_id: id }),
-  //     });
-  //   } else {
-  //     fetch("http://127.0.0.1:5000/api/cart/remove/", {
-  //       method: "post",
-  //       body: JSON.stringify({ member_id: user, movie_id: id }),
-  //     });
-  //     const index = newCart.indexOf(id);
-  //     newCart.splice(index, 1);
-  //   }
-  //   setCart(newCart);
-  // };
-  let called = false;
-  const getMovies = async () => {
-    // @TODO: remove debug to prevent remaking api call
-    if (called) {
-      return;
+  useEffect(() => {
+    if (user) {
+      fetchCart();
     }
-    called = true;
+  }, [fetchCart]);
+
+  const updateCart = (id, removeFromCart) => {
+    // console.log(`movie_id=${id}`);
+    // let newCart = [...cart];
+    // if (!removeFromCart) {
+    //   newCart.unshift(id);
+    //   fetch("http://127.0.0.1:5000/api/cart/add/", {
+    //     method: "post",
+    //     body: JSON.stringify({ member_id: user, movie_id: id }),
+    //   });
+    // } else {
+    //   fetch("http://127.0.0.1:5000/api/cart/remove/", {
+    //     method: "post",
+    //     body: JSON.stringify({ member_id: user, movie_id: id }),
+    //   });
+    //   const index = newCart.indexOf(id);
+    //   newCart.splice(index, 1);
+    // }
+    // setCart(newCart);
+  };
+  const getMovies = async () => {
     const response = await fetch("http://127.0.0.1:8080/api/v1/movies");
     if (response.ok) {
       const newMovies = await response.json();
       setMovies(newMovies);
-      console.log("here", movies.length, movies[0], movies[1]);
     }
   };
 
@@ -72,7 +67,7 @@ export const MoviePage = () => {
 
   useEffect(() => {
     getMovies();
-  });
+  }, []);
 
   return (
     <div>
@@ -99,7 +94,9 @@ export const MoviePage = () => {
       {/* <MovieTable movies={movies} updateCart={updateCart} cart={cart} /> */}
       <MovieTable
         movies={movies}
-        updateCart={() => console.log("update cart clicked")}
+        updateCart={() => {
+          console.log("update cart called");
+        }}
         cart={cart}
       />
     </div>

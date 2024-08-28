@@ -2,34 +2,24 @@ import React from "react";
 import { Button, Table } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 
+import { MovieTableHeader } from "./movie-table-header";
+
 export const MovieTable = ({ movies, updateCart, cart }) => {
-  const navigate = useNavigate();
-  const checkoutPath = "/checkout/";
-  const changeRoute = () => {
-    navigate(checkoutPath);
-  };
+  // const navigate = useNavigate();
+  // const checkoutPath = "/checkout/";
+  // const changeRoute = () => {
+  //   navigate(checkoutPath);
+  // };
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
     <div className="MovieTable">
       <Table striped>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Title</Table.HeaderCell>
-            <Table.HeaderCell>Rating</Table.HeaderCell>
-            <Table.HeaderCell>Year</Table.HeaderCell>
-            <Table.HeaderCell>Cast</Table.HeaderCell>
-            <Table.HeaderCell>Available</Table.HeaderCell>
-            <Table.HeaderCell>Rented</Table.HeaderCell>
-            <Table.HeaderCell>
-              <button disabled={!cart.length} onClick={changeRoute}>
-                Cart ({cart.length})
-              </button>
-            </Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
+        <MovieTableHeader user={user} cart={cart} />
 
         <Table.Body>
-          {movies.map((movie, index) => {
+          {movies.map((movie) => {
             return (
               <Table.Row key={`${movie.Id}`}>
                 <Table.Cell style={{ fontWeight: 1000, fontSize: "large" }}>
@@ -47,24 +37,28 @@ export const MovieTable = ({ movies, updateCart, cart }) => {
                     {movie.Cast.join(", ")}
                   </div>
                 </Table.Cell>
-                <Table.Cell>{movie.Inventory}</Table.Cell>
-                <Table.Cell>{movie.Rented}</Table.Cell>
-                <Table.Cell>
-                  {movie.Inventory !== 0 && (
-                    <Button
-                      onClick={() => {
-                        updateCart(
-                          movie.movie_id,
-                          cart.includes(movie.movie_id)
-                        );
-                      }}
-                    >
-                      {cart.includes(movie.movie_id)
-                        ? "Remove from cart"
-                        : "Add to cart"}
-                    </Button>
-                  )}
-                </Table.Cell>
+                {user ? (
+                  <>
+                    <Table.Cell>{movie.Inventory}</Table.Cell>
+                    <Table.Cell>{movie.Rented ? movie.Rented : 0}</Table.Cell>
+                    <Table.Cell>
+                      {movie.Inventory && (
+                        <Button
+                          onClick={() => {
+                            // updateCart(
+                            //   movie.movie_id,
+                            //   cart.includes(movie.movie_id)
+                            // );
+                          }}
+                        >
+                          {cart.includes(movie.movie_id)
+                            ? "Remove from cart"
+                            : "Add to cart"}
+                        </Button>
+                      )}
+                    </Table.Cell>
+                  </>
+                ) : null}
               </Table.Row>
             );
           })}

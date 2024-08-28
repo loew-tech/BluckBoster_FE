@@ -1,56 +1,63 @@
-import React, { useState } from 'react';
-import { Form, Button } from 'semantic-ui-react';
+import React, { useEffect, useState } from "react";
+import { Form, Button } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 
 export const LoginPage = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    console.log('rendeing login page')
+  const navigate = useNavigate();
 
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-
-    const navigate = useNavigate();
-
-    const login = async () => {
-        console.log(`login called with username=${username}, password=${password}`)
-        const respsonse = await fetch('http://127.0.0.1:5000/api/member/login', {
-            method: 'POST',
-            body: JSON.stringify({username: username, password: password})
-
-        })
-        if(respsonse.ok){
-            const data = await respsonse.json()
-            localStorage.setItem("user", data.member_id);
-            navigate('/movies/')
-        }
+  const login = async () => {
+    const respsonse = await fetch(
+      `http://127.0.0.1:8080/api/v1/members/${username}`
+    );
+    if (respsonse.ok) {
+      const data = await respsonse.json();
+      localStorage.setItem("user", JSON.stringify(data));
+      navigate("/movies/");
     }
+  };
 
-    return (
-        <div style={{ backgroundColor: 'gold', height: '175px' }}>
-            <Form>
-                <Form.Group widths='equal'>
-                <Form.Input
-                    fluid
-                    id='username'
-                    label='Username'
-                    placeholder='username'
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <Form.Input
+  useEffect(() => {
+    localStorage.setItem("user", null);
+  });
+  return (
+    <div style={{ backgroundColor: "gold", height: "175px" }}>
+      <Form>
+        <Form.Group widths="equal">
+          <Form.Input
+            fluid
+            id="username"
+            label="Username"
+            placeholder="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          {/* @TODO: decide what I want to do about passwords */}
+          {/* <Form.Input
                     fluid
                     id='password'
                     label='Password'
                     placeholder='password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                />
-                </Form.Group>
-                <Button type='submit' onClick={() => login()}>Submit</Button>
-            </Form>
-            <div>New to Bluckboster?</div>
-            <Button onClick={() => {navigate('/register/')}}>Sign Up!</Button>
-        </div>
-
-    )
-}
+                /> */}
+        </Form.Group>
+        <Button type="submit" onClick={() => login()}>
+          Submit
+        </Button>
+      </Form>
+      <div>New to Bluckboster?</div>
+      <Button
+        disabled={true}
+        onClick={() => {
+          navigate("/register/");
+        }}
+      >
+        Sign Up!
+      </Button>
+      <Button onClick={() => navigate("/movies/")}>EXPLORE OUR MOVIES!</Button>
+    </div>
+  );
+};
