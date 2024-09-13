@@ -21,12 +21,12 @@ export const MovieTable = ({ movies, updateCart, cart }) => {
         <Table.Body>
           {movies.map((movie) => {
             return (
-              <Table.Row key={`${movie.Id}`}>
+              <Table.Row key={`${movie.id}`}>
                 <Table.Cell style={{ fontWeight: 1000, fontSize: "large" }}>
-                  {movie.Title}
+                  {movie.title}
                 </Table.Cell>
-                <Table.Cell>{movie.Rating}</Table.Cell>
-                <Table.Cell>{movie.Year}</Table.Cell>
+                <Table.Cell>{movie.rating}</Table.Cell>
+                <Table.Cell>{movie.year}</Table.Cell>
                 <Table.Cell>
                   <div>
                     <p style={{ fontWeight: "bold" }}>Director:</p>
@@ -34,24 +34,21 @@ export const MovieTable = ({ movies, updateCart, cart }) => {
                   </div>
                   <div>
                     <p style={{ fontWeight: "bold" }}>Starring:</p>
-                    {movie.Cast.join(", ")}
+                    {movie.cast.join(", ")}
                   </div>
                 </Table.Cell>
                 {user ? (
                   <>
-                    <Table.Cell>{movie.Inventory}</Table.Cell>
-                    <Table.Cell>{movie.Rented ? movie.Rented : 0}</Table.Cell>
+                    <Table.Cell>{movie.inventory}</Table.Cell>
+                    <Table.Cell>{movie.rented ? movie.rented : 0}</Table.Cell>
                     <Table.Cell>
-                      {movie.Inventory && (
+                      {movie.inventory && (
                         <Button
                           onClick={() => {
-                            // updateCart(
-                            //   movie.movie_id,
-                            //   cart.includes(movie.movie_id)
-                            // );
+                            updateCart(movie.id, cart.includes(movie.id));
                           }}
                         >
-                          {cart.includes(movie.movie_id)
+                          {cart.includes(movie.id)
                             ? "Remove from cart"
                             : "Add to cart"}
                         </Button>

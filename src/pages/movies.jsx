@@ -4,45 +4,43 @@ import { MovieTable } from "../components/movie-table";
 import { getUser } from "../utils/utils";
 
 export const MoviePage = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [member, setMember] = useState("");
   const [movies, setMovies] = useState([]);
-  const [cart, setCart] = useState([]);
+  // const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(user && user.cart ? user.cart : []);
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // useEffect(() => {
+  //   if (user && user.cart) {
+  //     setCart(user.cart);
+  //   }
+  // }, []);
 
-  const fetchCart = useCallback(async () => {
-    // const response = await fetch(`http://127.0.0.1:5000/api/cart/${user}`);
-    // if (response.ok) {
-    //   const existingCart = await response.json();
-    //   setCart(existingCart);
-    // }
-  }, [user]);
-
-  useEffect(() => {
-    if (user) {
-      fetchCart();
+  const updateCart = (movie_id, removeFromCart) => {
+    console.log(`movie_id=${movie_id}`, `removeFromCart=${removeFromCart}`);
+    let newCart = [...cart];
+    if (!removeFromCart) {
+      newCart.unshift(movie_id);
+      fetch("http://127.0.0.1:8080/api/v1/members/cart", {
+        method: "put",
+        body: JSON.stringify({
+          username: user.username,
+          movie_id: movie_id,
+        }),
+      });
+    } else {
+      console.log("$$ IN else block");
+      fetch("http://127.0.0.1:8080/api/v1/members/cart/remove", {
+        method: "put",
+        body: JSON.stringify({ username: user.username, movie_id: movie_id }),
+      });
+      const index = newCart.indexOf(movie_id);
+      newCart.splice(index, 1);
     }
-  }, [fetchCart]);
-
-  const updateCart = (id, removeFromCart) => {
-    // console.log(`movie_id=${id}`);
-    // let newCart = [...cart];
-    // if (!removeFromCart) {
-    //   newCart.unshift(id);
-    //   fetch("http://127.0.0.1:5000/api/cart/add/", {
-    //     method: "post",
-    //     body: JSON.stringify({ member_id: user, movie_id: id }),
-    //   });
-    // } else {
-    //   fetch("http://127.0.0.1:5000/api/cart/remove/", {
-    //     method: "post",
-    //     body: JSON.stringify({ member_id: user, movie_id: id }),
-    //   });
-    //   const index = newCart.indexOf(id);
-    //   newCart.splice(index, 1);
-    // }
-    // setCart(newCart);
+    console.log("cart=", cart, "newCart=", newCart);
+    setCart(newCart);
   };
+
   const getMovies = async () => {
     const response = await fetch("http://127.0.0.1:8080/api/v1/movies");
     if (response.ok) {
@@ -51,14 +49,8 @@ export const MoviePage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   getUser().then((member) => {
-  //     setMember(member);
-  //   });
-  // }, []);
-
   movies.sort((a, b) => {
-    if (a.Title < b.Title) {
+    if (a.title < b.title) {
       return -1;
     } else {
       return 1;
@@ -85,20 +77,15 @@ export const MoviePage = () => {
               {member.first_name} {member.last_name}
             </a>
           </li>
-          <li style={{ fontWeight: 1000, fontSize: "large" }}>
-            {" "}
-            Currently rented: {member.currently_rented}
-          </li>
+          {user ? (
+            <li style={{ fontWeight: 1000, fontSize: "large" }}>
+              {" "}
+              Currently rented: {member.currently_rented}
+            </li>
+          ) : null}
         </ul>
       </div>
-      {/* <MovieTable movies={movies} updateCart={updateCart} cart={cart} /> */}
-      <MovieTable
-        movies={movies}
-        updateCart={() => {
-          console.log("update cart called");
-        }}
-        cart={cart}
-      />
+      <MovieTable movies={movies} updateCart={updateCart} cart={cart} />
     </div>
   );
 };
