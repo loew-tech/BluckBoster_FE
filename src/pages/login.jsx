@@ -21,11 +21,9 @@ export const LoginPage = () => {
     );
     if (respsonse.ok) {
       const data = await respsonse.json();
-      console.log("here data=", data, data.username);
       localStorage.setItem("user", JSON.stringify(data));
       navigate("/movies/");
-      // @TODO: should this just be an else instead of else if
-    } else if (respsonse.status === 404) {
+    } else {
       setFailedLogin(true);
     }
   };

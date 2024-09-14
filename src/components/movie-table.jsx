@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { MovieTableHeader } from "./movie-table-header";
 
-export const MovieTable = ({ movies, updateCart, cart }) => {
+export const MovieTable = ({ movies, cartUpdate, cart }) => {
   // const navigate = useNavigate();
   // const checkoutPath = "/checkout/";
   // const changeRoute = () => {
@@ -45,7 +45,7 @@ export const MovieTable = ({ movies, updateCart, cart }) => {
                       {movie.inventory && (
                         <Button
                           onClick={() => {
-                            updateCart(movie.id, cart.includes(movie.id));
+                            cartUpdate(movie.id, cart.includes(movie.id));
                           }}
                         >
                           {cart.includes(movie.id)

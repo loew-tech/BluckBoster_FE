@@ -1,45 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { MovieTable } from "../components/movie-table";
 
-import { getUser } from "../utils/utils";
+import { MovieTable } from "../components/movie-table";
+import { updateCart } from "../utils/utils";
 
 export const MoviePage = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [member, setMember] = useState("");
   const [movies, setMovies] = useState([]);
-  // const [cart, setCart] = useState([]);
   const [cart, setCart] = useState(user && user.cart ? user.cart : []);
-
-  // useEffect(() => {
-  //   if (user && user.cart) {
-  //     setCart(user.cart);
-  //   }
-  // }, []);
-
-  const updateCart = (movie_id, removeFromCart) => {
-    console.log(`movie_id=${movie_id}`, `removeFromCart=${removeFromCart}`);
-    let newCart = [...cart];
-    if (!removeFromCart) {
-      newCart.unshift(movie_id);
-      fetch("http://127.0.0.1:8080/api/v1/members/cart", {
-        method: "put",
-        body: JSON.stringify({
-          username: user.username,
-          movie_id: movie_id,
-        }),
-      });
-    } else {
-      console.log("$$ IN else block");
-      fetch("http://127.0.0.1:8080/api/v1/members/cart/remove", {
-        method: "put",
-        body: JSON.stringify({ username: user.username, movie_id: movie_id }),
-      });
-      const index = newCart.indexOf(movie_id);
-      newCart.splice(index, 1);
-    }
-    console.log("cart=", cart, "newCart=", newCart);
-    setCart(newCart);
-  };
 
   const getMovies = async () => {
     const response = await fetch("http://127.0.0.1:8080/api/v1/movies");
@@ -60,6 +28,10 @@ export const MoviePage = () => {
   useEffect(() => {
     getMovies();
   }, []);
+
+  const cartUpdate = (movies_id, removeFromCart) => {
+    setCart(updateCart(user.username, movies_id, cart, removeFromCart));
+  };
 
   return (
     <div>
@@ -85,7 +57,7 @@ export const MoviePage = () => {
           ) : null}
         </ul>
       </div>
-      <MovieTable movies={movies} updateCart={updateCart} cart={cart} />
+      <MovieTable movies={movies} cartUpdate={cartUpdate} cart={cart} />
     </div>
   );
 };
