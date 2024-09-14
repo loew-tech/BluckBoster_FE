@@ -5,12 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { fetchCart, updateCart } from "../utils/utils";
 
 export const CheckoutPage = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(localStorage.getItem("user"));
+
   const [cart, setCart] = useState([]);
   const [movies, setMovies] = useState([]);
   const [member, setMember] = useState("");
 
   const navigate = useNavigate();
+  const removeFromCart = true;
 
   const checkout = async () => {
     // @TODO: remove debug return
@@ -28,49 +30,15 @@ export const CheckoutPage = () => {
     navigate("/movies/");
   };
 
-  // const fetchCart = useCallback(async () => {
-  //   const response = await fetch(`http://127.0.0.1:5000/api/cart/${user}`);
-  //   if (response.ok) {
-  //     const existingCart = await response.json();
-  //     setCart(existingCart);
-  //   }
-  // }, [user]);
-
-  // const fetchCartMovies = useCallback(async () => {
-  //   const response = await fetch(
-  //     `http://127.0.0.1:5000/api/cart/movies?movies=${cart}`
-  //   );
-  //   if (response.ok) {
-  //     const cartMovies = await response.json();
-  //     setMovies(cartMovies);
-  //   }
-  // }, [cart]);
-
-  // useEffect(() => {
-  //   getUser().then((member) => {
-  //     setMember(member);
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   fetchCart();
-  // }, [fetchCart]);
-
-  // useEffect(() => {
-  //   if (cart.length) {
-  //     fetchCartMovies();
-  //   } else {
-  //     setMovies([]);
-  //   }
-  // }, [cart, fetchCartMovies]);
-
   useEffect(() => {
     console.log("username=", user.username, user);
     if (user.username) {
-      fetchCart(user.username).then((cart) => {
-        setCart(cart);
+      fetchCart(user.username).then((movies) => {
+        setMovies(movies);
+        setCart(movies.map((movie) => movie.id));
       });
     } else {
+      setMovies([]);
       setCart([]);
     }
   }, []);
@@ -97,20 +65,34 @@ export const CheckoutPage = () => {
       </div>
       <Table striped>
         <Table.Body>
-          {cart.map((movie) => {
+          {movies.map((movie) => {
             return (
               <Table.Row key={movie.id}>
                 <Table.Cell style={{ fontWeight: 1000, fontSize: "large" }}>
                   {movie.title}
                 </Table.Cell>
                 <Table.Cell>
-                  <Button
-                    onClick={() => {
-                      updateCart(movie.id, true);
-                    }}
-                  >
-                    Remove From Cart
-                  </Button>
+                  {movie.inventory ? (
+                    <Button
+                      onClick={() => {
+                        setCart(
+                          updateCart(
+                            user.username,
+                            movie.id,
+                            cart,
+                            removeFromCart
+                          )
+                        );
+                        user.cart.splice(user.cart.indexOf(movie.id), 1);
+                        localStorage.setItem("user", JSON.stringify(user));
+                        setMovies(movies.filter((m) => m.id !== movie.id));
+                      }}
+                    >
+                      RemoveFromCart
+                    </Button>
+                  ) : (
+                    <Button disabled={true}>Out of Stock</Button>
+                  )}
                 </Table.Cell>
               </Table.Row>
             );

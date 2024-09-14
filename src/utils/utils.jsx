@@ -1,14 +1,4 @@
-// export const fetchCart = async (username) => {
-//   console.log("tick tick tick");
-//   const cart = await fetch(
-//     `http://127.0.0.1:8080/api/v1/members/cart/${username}`
-//   );
-//   console.log("ret=", cart, cart.ok ? cart.json() : []);
-//   return cart.ok ? cart.json() : [];
-// };
-
 export const fetchCart = async (username) => {
-  console.log("tick tick tick");
   const response = await fetch(
     `http://127.0.0.1:8080/api/v1/members/cart/${username}`
   );
@@ -20,7 +10,7 @@ export const fetchCart = async (username) => {
 };
 
 export const updateCart = (username, movie_id, cart, removeFromCart) => {
-  console.log(`movie_id=${movie_id}`, `removeFromCart=${removeFromCart}`);
+  console.log(`$movie_id=${movie_id}`, `$removeFromCart=${removeFromCart}`);
   let newCart = [...cart];
   if (!removeFromCart) {
     newCart.unshift(movie_id);
