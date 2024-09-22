@@ -3,6 +3,7 @@ import { Table, Button } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 
 import { fetchCart, updateCart } from "../utils/utils";
+import { MovieTable } from "../components/movie-table";
 
 export const CheckoutPage = () => {
   let user = JSON.parse(localStorage.getItem("user"));
@@ -15,19 +16,34 @@ export const CheckoutPage = () => {
   const removeFromCart = true;
 
   const checkout = async () => {
-    // @TODO: remove debug return
-    console.log("checking out");
-    return;
-    const response = await fetch("http://127.0.0.1:5000/api/cart/checkout/", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ member_id: user }),
-    });
+    const response = await fetch(
+      "http://127.0.0.1:8080/api/v1/members/checkout/",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: user.username, movie_ids: user.cart }),
+      }
+    );
     console.log(`checkout response=${JSON.stringify(response)}`);
     navigate("/movies/");
+  };
+
+  const cartRemove = (movie) => {
+    console.log("## user", user);
+    setCart(updateCart(user.username, movie.id, cart, removeFromCart));
+    // user.cart.splice(user.cart.indexOf(movie.id), 1);
+    setMovies(movies.filter((m) => m.id !== movie.id));
+    // localStorage.setItem("user", JSON.stringify(user));
+    const foo = async () => {
+      user.cart.splice(user.cart.indexOf(movie.id), 1);
+    };
+
+    foo().then((response) => {
+      localStorage.setItem("user", JSON.stringify(user));
+    });
   };
 
   useEffect(() => {
@@ -59,7 +75,7 @@ export const CheckoutPage = () => {
           </li>
           <li style={{ fontWeight: 1000, fontSize: "large" }}>
             {" "}
-            Currently rented: {member.currently_rented}
+            Currently rented: {user.checked_out ? user.checked_out.length : 0}
           </li>
         </ul>
       </div>
@@ -75,17 +91,7 @@ export const CheckoutPage = () => {
                   {movie.inventory ? (
                     <Button
                       onClick={() => {
-                        setCart(
-                          updateCart(
-                            user.username,
-                            movie.id,
-                            cart,
-                            removeFromCart
-                          )
-                        );
-                        user.cart.splice(user.cart.indexOf(movie.id), 1);
-                        localStorage.setItem("user", JSON.stringify(user));
-                        setMovies(movies.filter((m) => m.id !== movie.id));
+                        cartRemove(movie);
                       }}
                     >
                       RemoveFromCart

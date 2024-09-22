@@ -1,6 +1,14 @@
 export const fetchCart = async (username) => {
   const response = await fetch(
     `http://127.0.0.1:8080/api/v1/members/cart/${username}`
+    // @TODO: why is this causing cors error?
+    // `http://127.0.0.1:8080/api/v1/members/${username}/cart/`,
+    // {
+    //   mode: "no-cors",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // }
   );
   if (response.ok) {
     const existingCart = await response.json();

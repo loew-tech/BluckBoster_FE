@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 import { MovieTable } from "../components/movie-table";
 import { updateCart } from "../utils/utils";
 
 export const MoviePage = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const [member, setMember] = useState("");
   const [movies, setMovies] = useState([]);
   const [cart, setCart] = useState(user && user.cart ? user.cart : []);
 
@@ -46,13 +45,21 @@ export const MoviePage = () => {
           </li>
           <li style={{ fontWeight: 1000, fontSize: "large", padding: "8px" }}>
             <a color="gold" href="/member/">
-              {member.first_name} {member.last_name}
+              {user.first_name} {user.last_name}
             </a>
           </li>
           {user ? (
-            <li style={{ fontWeight: 1000, fontSize: "large" }}>
-              {" "}
-              Currently rented: {member.currently_rented}
+            <li
+              style={{
+                fontWeight: 1000,
+                fontSize: "large",
+                paddingLeft: "8px",
+              }}
+            >
+              <p>
+                Currently rented:{" "}
+                {user.checked_out ? user.checked_out.length : 0}
+              </p>
             </li>
           ) : null}
         </ul>
