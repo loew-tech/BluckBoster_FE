@@ -3,14 +3,12 @@ import { Table, Button } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 
 import { fetchCart, updateCart } from "../utils/utils";
-import { MovieTable } from "../components/movie-table";
 
 export const CheckoutPage = () => {
   let user = JSON.parse(localStorage.getItem("user"));
 
   const [cart, setCart] = useState([]);
   const [movies, setMovies] = useState([]);
-  const [member, setMember] = useState("");
 
   const navigate = useNavigate();
   const removeFromCart = true;
@@ -28,7 +26,10 @@ export const CheckoutPage = () => {
       }
     );
     console.log(`checkout response=${JSON.stringify(response)}`);
-    navigate("/movies/");
+    if (response.ok) {
+      navigate("/movies/");
+    }
+    // @TODO: failed checkout message
   };
 
   const cartRemove = (movie) => {
@@ -52,6 +53,14 @@ export const CheckoutPage = () => {
       fetchCart(user.username).then((movies) => {
         setMovies(movies);
         setCart(movies.map((movie) => movie.id));
+        // @TODO: better way to handle cart syncing issue?
+        const foo = async () => {
+          user.cart = cart;
+        };
+
+        foo().then((response) => {
+          localStorage.setItem("user", JSON.stringify(user));
+        });
       });
     } else {
       setMovies([]);
@@ -70,7 +79,7 @@ export const CheckoutPage = () => {
           </li>
           <li style={{ fontWeight: 1000, fontSize: "large", padding: "15px" }}>
             <a href="/member/">
-              {member.first_name} {member.last_name}
+              {user.first_name} {user.last_name}
             </a>
           </li>
           <li style={{ fontWeight: 1000, fontSize: "large" }}>
