@@ -28,14 +28,18 @@ export const MoviePage = () => {
     getMovies();
   }, []);
 
-  const cartUpdate = (movies_id, removeFromCart) => {
-    setCart(updateCart(user.username, movies_id, cart, removeFromCart));
+  const cartUpdate = (movie_id, removeFromCart) => {
+    setCart(updateCart(user.username, movie_id, cart, removeFromCart));
+    const index = user.cart.indexOf(movie_id);
+    if (-1 < index) {
+      user.cart.splice(index, 1);
+      localStorage.setItem("user", JSON.stringify(user));
+    }
   };
 
   return (
     <div>
       {/* @TODO: (1) move this into it's own component to reuse in other pages; (2) change text color of link to members page */}
-      {/* @TODO: (2) seems to be re-rendering. Need to figure that out*/}
       <div
         style={{ backgroundColor: "darkblue", height: "150px", color: "gold" }}
       >
