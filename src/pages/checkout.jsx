@@ -15,36 +15,38 @@ export const CheckoutPage = () => {
 
   const checkout = async () => {
     const response = await fetch(
-      "http://127.0.0.1:8080/api/v1/members/checkout/",
+      "http://127.0.0.1:8080/api/v1/members/checkout",
       {
         method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: user.username, movie_ids: user.cart }),
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
+        body: JSON.stringify({ username: user.username, movie_ids: cart }),
       }
     );
-    console.log(`checkout response=${JSON.stringify(response)}`);
+    // await response.json();
+    console.log(response);
+    // console.log(`checkout response=${JSON.stringify(response)}`);
+    // console.log("status=", response.status, response.ok, await response.json());
+    // @TODO: why is response.ok false
     if (response.ok) {
       navigate("/movies/");
+      cart.forEach((moive_id) => {
+        user.checked_out.push(moive_id);
+      });
+      user.cart = [];
+      localStorage.setItem("user", JSON.stringify(user));
     }
     // @TODO: failed checkout message
   };
 
   const cartRemove = (movie) => {
     console.log("## user", user);
-    setCart(updateCart(user.username, movie.id, cart, removeFromCart));
-    // user.cart.splice(user.cart.indexOf(movie.id), 1);
+    const newCart = updateCart(user.username, movie.id, cart, removeFromCart);
+    setCart(newCart);
+    user.cart = newCart;
+    localStorage.setItem("user", JSON.stringify(user));
     setMovies(movies.filter((m) => m.id !== movie.id));
-    // localStorage.setItem("user", JSON.stringify(user));
-    const foo = async () => {
-      user.cart.splice(user.cart.indexOf(movie.id), 1);
-    };
-
-    foo().then((response) => {
-      localStorage.setItem("user", JSON.stringify(user));
-    });
   };
 
   useEffect(() => {
@@ -53,14 +55,9 @@ export const CheckoutPage = () => {
       fetchCart(user.username).then((movies) => {
         setMovies(movies);
         setCart(movies.map((movie) => movie.id));
+        user.cart = movies.map((movie) => movie.id);
+        localStorage.setItem("user", JSON.stringify(user));
         // @TODO: better way to handle cart syncing issue?
-        const foo = async () => {
-          user.cart = cart;
-        };
-
-        foo().then((response) => {
-          localStorage.setItem("user", JSON.stringify(user));
-        });
       });
     } else {
       setMovies([]);

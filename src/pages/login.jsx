@@ -10,17 +10,14 @@ export const LoginPage = () => {
   const navigate = useNavigate();
 
   const login = async () => {
-    const respsonse = await fetch(
-      `http://127.0.0.1:8080/api/v1/members/login`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          username: username,
-        }),
-      }
-    );
-    if (respsonse.ok) {
-      const data = await respsonse.json();
+    const response = await fetch(`http://127.0.0.1:8080/api/v1/members/login`, {
+      method: "POST",
+      body: JSON.stringify({
+        username: username,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
       localStorage.setItem("user", JSON.stringify(data));
       navigate("/movies/");
     } else {
